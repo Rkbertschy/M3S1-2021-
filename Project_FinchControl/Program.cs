@@ -12,7 +12,7 @@ namespace Project_FinchControl
     // Application Type: Console
     // Author: Ryan Bertschy
     // Dated Created: 2/20/2021
-    // Last Modified: 2/21/2021  
+    // Last Modified: 2/28/2021  
     //
    
 
@@ -41,7 +41,7 @@ namespace Project_FinchControl
         }
 
         /// <summary>
-        /// Home Screen
+        /// Home Screen  
         /// </summary>
         static void DisplayMenuScreen()
         {
@@ -137,9 +137,9 @@ namespace Project_FinchControl
                 //
                 // user Data Recorder screen
                 //
-                Console.WriteLine("\ta)Get the number of Data Points ");
-                Console.WriteLine("\tb)Get the frequency of data Points ");
-                Console.WriteLine("\tc)Get the Data set ");
+                Console.WriteLine("\ta) Number of Data Points");
+                Console.WriteLine("\tb) Frequency of data Points");
+                Console.WriteLine("\tc) Get Data");
                 Console.WriteLine("\td) Display the data set");
                 Console.WriteLine("\tq) Back");
                 Console.Write("\t\tEnter Choice:");
@@ -196,18 +196,20 @@ namespace Project_FinchControl
         static void DataRecorderDisplayDataTable(double[] temperatures)
         {
             Console.WriteLine(
-                "\t\tReading #".PadLeft(15) +
-                "Temerature".PadLeft(15)
+                "\t\tReading #".PadLeft(20) +
+                "Temerature".PadLeft(20)
                 );
 
             for (int index = 0; index < temperatures.Length; index++)
             {
                 Console.WriteLine(
-                    (index + 1).ToString().PadLeft(15) +
-                    temperatures[index].ToString("n2").PadLeft(15)
+                    (index + 1).ToString().PadLeft(25) +
+                    temperatures[index].ToString("n2").PadLeft(25)
                     );
 
             }
+
+            DisplayContinuePrompt();
         }
 
         /// <summary>
@@ -238,22 +240,17 @@ namespace Project_FinchControl
             Console.WriteLine($"\t\tNumber of Data Points: {numberOfDataPoints}");
             Console.WriteLine($"\t\tFrequency of Data Points: {frequencyOfDataPointsInSecounds}");
             Console.WriteLine();
-
             Console.WriteLine("\t\tThe Finch Robot is ready to recorder the temperatures. Please press any key to start.");
             Console.ReadKey();
 
 
-            double temperature;
-            int frequencyMillSec;
             for (int index = 0; index < numberOfDataPoints; index++)
             {
-                temperature = finchRobot.getTemperature();
-                Console.WriteLine($"\t\tTemerature Recorded {index + 1}: {temperature}");
-                temeratures[index] = temperature;
-                frequencyMillSec = (int)(frequencyOfDataPointsInSecounds * 1000);
-                finchRobot.wait(frequencyMillSec);
+                temeratures[index] = finchRobot.getTemperature();
+                Console.WriteLine($"\t Reading {index + 1}: {temeratures[index].ToString("n2")}");
+                int waitInSecounds = (int)(frequencyOfDataPointsInSecounds * 1000);
+                finchRobot.wait(waitInSecounds);
             }
-
 
             DisplayContinuePrompt();
 
@@ -266,18 +263,18 @@ namespace Project_FinchControl
         /// <param name="finchRobot"></param>
         static double DataRecorderDisplayGetFrequencyOfDataPoints()
         {
+            string userResponse;
             double frequencyOfDataPoints;
             bool validResponse;
+                        
+            DisplayScreenHeader("\t\tThe Frequency of the Data Points");
 
-
-            validResponse = false;
             do
             {
+                Console.Write("\t\tEnter the Frequency of the Data Points.  ");
+                userResponse = Console.ReadLine();
 
-                DisplayScreenHeader("\t\tThe Frequency of the Data Points");
-
-                Console.Write("\t\tEnter the Frequency of the Data Points");
-                double.TryParse(Console.ReadLine(), out frequencyOfDataPoints);
+                validResponse = double.TryParse(userResponse, out frequencyOfDataPoints);
 
                 if (frequencyOfDataPoints > 0)
                 {
@@ -285,9 +282,8 @@ namespace Project_FinchControl
                 }
                 else
                 {
+                    Console.WriteLine("\t\tPlease enter a number greater then 0.  ");
                     Console.WriteLine();
-                    Console.WriteLine("\t\tPlease enter a postive number and a number greater then 0");
-                    DisplayContinuePrompt();
                 }
 
 
@@ -310,19 +306,34 @@ namespace Project_FinchControl
         /// <param name="finchRobot"></param>
         static int DataRecorderDisplayGetNumberOfDataPoints()
         {
+            string userResponse;
             int numberOfDataPoints;
+            bool validResponse;
 
             DisplayScreenHeader("\t\tNumber of Data Points");
 
-            Console.Write("\t\tEnter the number of Data Points");
-            int.TryParse(Console.ReadLine(), out numberOfDataPoints);
+            do
+            {
+                Console.Write("\t\tEnter the number of Data Points.  ");
+                userResponse = Console.ReadLine();
+
+                validResponse = int.TryParse(userResponse, out numberOfDataPoints);
+
+                if (!validResponse)
+                {
+                    Console.WriteLine("\t\tPLease enter an integer  ");
+                    Console.WriteLine();
+                }
+
+
+            } while (!validResponse);
 
             Console.WriteLine();
-            Console.WriteLine($"\t\tNumber of Data Points: {numberOfDataPoints}");
-
-
-            DisplayContinuePrompt();
-
+            Console.WriteLine($"\t\t There are {numberOfDataPoints} Data Points.");
+            Console.WriteLine();
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
+                       
             return numberOfDataPoints;
         }
 
@@ -710,7 +721,7 @@ namespace Project_FinchControl
         }
 
         #endregion
-
+                
         #region FINCH ROBOT MANAGEMENT
 
         /// <summary>
